@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paddle Game</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #000; /* Dark black background */
+    }
+
+    canvas {
+      border: 2px solid #fff;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="800" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const paddleWidth = 10;
+  const paddleHeight = 60;
+  const paddleSpeed = 4;
+
+  let userPaddleY = (canvas.height - paddleHeight) / 2;
+  let computerPaddleY = (canvas.height - paddleHeight) / 2;
+  let ballX = canvas.width / 2;
+  let ballY = canvas.height / 2;
+  let ballSpeedX = 5;
+  let ballSpeedY = 2;
+
+  function draw() {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw user paddle
+    ctx.fillStyle = "#00FF00"; // Green color
+    ctx.fillRect(0, userPaddleY, paddleWidth, paddleHeight);
+
+    // Draw computer paddle
+    ctx.fillStyle = "#00FF00"; // Green color
+    ctx.fillRect(canvas.width - paddleWidth, computerPaddleY, paddleWidth, paddleHeight);
+
+    // Draw ball
+    ctx.beginPath();
+    ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
+    ctx.fillStyle = "#FF0000"; // Red color
+    ctx.fill();
+    ctx.closePath();
+
+    // Move computer paddle based on ball position
+    if (ballY > computerPaddleY + paddleHeight / 2) {
+      computerPaddleY += paddleSpeed;
+    } else {
+      computerPaddleY -= paddleSpeed;
+    }
+
+    // Move the ball
+    ballX += ballSpeedX;
+    ballY += ballSpeedY;
+
+    // Bounce off top and bottom walls
+    if (ballY + 8 > canvas.height || ballY - 8 < 0) {
+      ballSpeedY = -ballSpeedY;
+    }
+
+    // Bounce off paddles
+    if (
+      (ballX < paddleWidth && ballY > userPaddleY && ballY < userPaddleY + paddleHeight) ||
+      (ballX > canvas.width - paddleWidth && ballY > computerPaddleY && ballY < computerPaddleY + paddleHeight)
+    ) {
+      ballSpeedX = -ballSpeedX;
+    }
+
+    // Reset ball position if it goes beyond paddles
+    if (ballX < 0 || ballX > canvas.width) {
+      ballX = canvas.width / 2;
+      ballY = canvas.height / 2;
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  document.addEventListener("mousemove", (event) => {
+    const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    userPaddleY = mouseY - paddleHeight / 2;
+  });
+
+  draw();
+</script>
+
+</body>
+</html>
+
